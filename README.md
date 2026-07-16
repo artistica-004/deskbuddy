@@ -120,4 +120,8 @@ This project is licensed under the [MIT License](LICENSE) — free to use, modif
 
 Made with 💪 to fight the sitting-all-day life.
 
+<<<<<<< HEAD
 </div>
+=======
+</div>
+>>>>>>> 765f0589b3760b77163380b276aaf90408577efa
