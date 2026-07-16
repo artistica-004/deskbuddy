@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Notification, screen } = require('electron');
+const { app, BrowserWindow, Notification, screen, ipcMain } = require('electron');
 
 app.setLoginItemSettings({
   openAtLogin: true
@@ -43,6 +43,7 @@ function triggerReminder() {
   const task = tasks[taskIndex];
   taskIndex = (taskIndex + 1) % tasks.length;
 
+  win.show();               // make sure it's visible again for the new reminder
   win.webContents.send('play-task', task.name);
 
   new Notification({
@@ -53,10 +54,13 @@ function triggerReminder() {
   console.log('Reminder fired at', new Date().toLocaleTimeString(), '-', task.label);
 }
 
+ipcMain.on('hide-widget', () => {
+  win.hide();
+});
+
 app.whenReady().then(() => {
   createWindow();
 
-  // check every minute whether we're exactly on the hour, between 10am-10pm
   setInterval(() => {
     const now = new Date();
     const hour = now.getHours();
@@ -65,5 +69,9 @@ app.whenReady().then(() => {
     if (minute === 0 && hour >= 10 && hour < 22) {
       triggerReminder();
     }
-  }, 60 * 1000); // check every minute
+  }, 60 * 1000);
+});
+
+app.on('window-all-closed', () => {
+  app.quit();
 });
