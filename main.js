@@ -1,10 +1,12 @@
-const { app, BrowserWindow, Notification, screen, ipcMain } = require('electron');
+const { app, BrowserWindow, Notification, screen, ipcMain, Tray, Menu } = require('electron');
+const path = require('path');
 
 app.setLoginItemSettings({
   openAtLogin: true
 });
 
 let win;
+let tray;
 
 const tasks = [
   { name: 'drink', label: 'Drink some water 💧' },
@@ -39,11 +41,25 @@ function createWindow() {
   win.loadFile('index.html');
 }
 
+function createTray() {
+  tray = new Tray(path.join(__dirname, 'assets', 'icon.png'));
+
+  const contextMenu = Menu.buildFromContextMenu ? null : Menu.buildFromTemplate([
+    { label: 'Show DeskBuddy', click: () => win.show() },
+    { label: 'Hide DeskBuddy', click: () => win.hide() },
+    { type: 'separator' },
+    { label: 'Quit DeskBuddy', click: () => app.quit() }
+  ]);
+
+  tray.setToolTip('DeskBuddy');
+  tray.setContextMenu(contextMenu);
+}
+
 function triggerReminder() {
   const task = tasks[taskIndex];
   taskIndex = (taskIndex + 1) % tasks.length;
 
-  win.show();               // make sure it's visible again for the new reminder
+  win.show();
   win.webContents.send('play-task', task.name);
 
   new Notification({
@@ -60,6 +76,7 @@ ipcMain.on('hide-widget', () => {
 
 app.whenReady().then(() => {
   createWindow();
+  createTray();
 
   setInterval(() => {
     const now = new Date();
@@ -73,5 +90,5 @@ app.whenReady().then(() => {
 });
 
 app.on('window-all-closed', () => {
-  app.quit();
+  // don't quit when window is hidden/closed — only quit via tray menu
 });
