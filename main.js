@@ -7,6 +7,7 @@ app.setLoginItemSettings({
 
 let win;
 let tray;
+let isQuitting = false;
 
 const tasks = [
   { name: 'drink', label: 'Drink some water 💧' },
@@ -39,20 +40,37 @@ function createWindow() {
   });
 
   win.loadFile('index.html');
+
+  // intercept the close (X) action — hide instead of quitting
+  win.on('close', (e) => {
+    if (!isQuitting) {
+      e.preventDefault();
+      win.hide();
+    }
+  });
 }
 
 function createTray() {
   tray = new Tray(path.join(__dirname, 'assets', 'icon.png'));
 
-  const contextMenu = Menu.buildFromContextMenu ? null : Menu.buildFromTemplate([
+  const contextMenu = Menu.buildFromTemplate([
     { label: 'Show DeskBuddy', click: () => win.show() },
     { label: 'Hide DeskBuddy', click: () => win.hide() },
     { type: 'separator' },
-    { label: 'Quit DeskBuddy', click: () => app.quit() }
+    {
+      label: 'Quit DeskBuddy',
+      click: () => {
+        isQuitting = true;
+        app.quit();
+      }
+    }
   ]);
 
   tray.setToolTip('DeskBuddy');
   tray.setContextMenu(contextMenu);
+
+  // bonus: double-clicking the tray icon shows the widget
+  tray.on('double-click', () => win.show());
 }
 
 function triggerReminder() {
@@ -90,5 +108,5 @@ app.whenReady().then(() => {
 });
 
 app.on('window-all-closed', () => {
-  // don't quit when window is hidden/closed — only quit via tray menu
+  // intentionally empty — don't quit when window closes, only via tray "Quit"
 });
