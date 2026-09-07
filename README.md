@@ -35,7 +35,7 @@ Sitting at a desk all day is easy to fall into and hard to break out of. Instead
 | Feature | Description |
 |---|---|
 | 🪟 Floating widget | Transparent, frameless, always-on-top window |
-| ⏰ Smart scheduling | Reminders only fire between 10 AM–10 PM, once per hour |
+| ⏰ Smart scheduling | Reminders only fire between 10 AM–10 PM, once per clock hour — drift-safe with 30s polling and hour tracking |
 | 🎥 Green-screen animation | Real video clips with the background removed in real time (canvas-based chroma keying) |
 | 🔔 Native notifications | Uses Windows' built-in notification system |
 | 🚀 Auto-start | Launches automatically on login |
